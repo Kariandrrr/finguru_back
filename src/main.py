@@ -4,12 +4,11 @@ import uvicorn
 from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
 
-from api import api_router
-from core.config import settings
-from core.models import db_helper
+from .core.config import settings
+from .core.models import db_helper
 
-from authorisation import router as authorisation_router
-
+from .authorisation import router as authorisation_router
+from .api import api_router
 
 
 @asynccontextmanager
@@ -20,7 +19,7 @@ async def lifespan(app: FastAPI):
 
 
 
-main_app = FastAPI(
+app = FastAPI(
     lifespan=lifespan,
 )
 
@@ -30,18 +29,19 @@ origins = {
     "http://localhost:3000",  # если create-react-app
 }
 
-main_app.add_middleware(
+app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
-main_app.include_router(api_router, prefix=settings.api.prefix)
-main_app.include_router(authorisation_router, prefix=settings.authorisation.prefix)
+app.include_router(api_router, prefix=settings.api.prefix)
+app.include_router(authorisation_router,
+                   prefix="/auth")
 
 
 if __name__ == "__main__":
     uvicorn.run(
-        "main:main_app", reload=True, host=settings.run.host, port=settings.run.port
+        "main:app", reload=True, host=settings.run.host, port=settings.run.port
     )

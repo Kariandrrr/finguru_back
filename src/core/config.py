@@ -69,7 +69,10 @@ class Settings(BaseSettings):
     gunicorn: GunicornConfig = GunicornConfig()
     logging: LoggingConfig = LoggingConfig()
     api: ApiPrefix = ApiPrefix()
-    db: DatabaseConfig
+    db: DatabaseConfig | None = None
 
+    bot_token: str = ""
+    base_site: str = ""
+    admin_id: str = ""
 
 settings = Settings()
