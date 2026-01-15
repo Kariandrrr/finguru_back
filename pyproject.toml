@@ -12,6 +12,7 @@ sqlalchemy = {extras = ["asyncio"], version = "^2.0.45"}
 asyncpg = "^0.31.0"
 alembic = "^1.18.0"
 npm = "^0.1.1"
+aiosqlite = "^0.22.1"
 
 [dependency-groups]
 dev = [
