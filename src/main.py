@@ -37,7 +37,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 app.include_router(api_router, prefix=settings.api.prefix)
-app.include_router(authorisation_router, prefix=settings.authorisation.prefix)
+app.include_router(authorisation_router,
+                   prefix="/auth")
 
 
 if __name__ == "__main__":
