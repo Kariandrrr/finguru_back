@@ -7,8 +7,8 @@ from starlette.middleware.cors import CORSMiddleware
 from core.config import settings
 from core.models import db_helper
 
-from authorisation import router as authorisation_router
-from api import api_router
+from .authorisation import router as authorisation_router
+from .api import api_router
 
 
 @asynccontextmanager
