@@ -1,4 +1,5 @@
 import os, json, hmac, hashlib
+import time
 from urllib.parse import parse_qsl
 
 from fastapi import APIRouter, Request, HTTPException
@@ -7,12 +8,21 @@ router = APIRouter()
 
 BOT_TOKEN = os.getenv("BOT_TOKEN", "")
 
-def validate_init_data(init_data):
+def validate_init_data(init_data: str, max_age: int = 3600) -> dict | None:
     data = dict(parse_qsl(init_data, keep_blank_values=True))
 
     got_hash = data.pop("hash", "")
     if not got_hash:
         raise HTTPException(status_code=400, detail="Hash is required")
+
+    try:
+        auth_date = int(data["auth_date"])
+    except (KeyError, ValueError):
+        raise HTTPException(status_code=400, detail="Auth date is required")
+
+    current_time = int(time.time())
+    if current_time - auth_date > max_age:
+        raise HTTPException(status_code=403, detail="Init data expired")
 
     data_check_string = "\n".join(
         f"{k}={data[k]}" for k in sorted(
@@ -26,7 +36,10 @@ def validate_init_data(init_data):
     if not hmac.compare_digest(calc_hash, got_hash):
         raise HTTPException(status_code=400, detail="Hash is invalid")
 
-    return json.loads(data["user"]) if "user" in data else None
+    user_str = data.get("user")
+    if user_str:
+        return json.loads(user_str)
+    return None
 
 
 @router.post("/tg/auth")
