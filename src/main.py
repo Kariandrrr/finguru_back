@@ -4,11 +4,11 @@ import uvicorn
 from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
 
-from .core.config import settings
-from .core.models import db_helper
+from core.config import settings
+from core.models import db_helper
 
-from .authorisation import router as authorisation_router
-from .api import api_router
+# from .authorisation import router as authorisation_router
+# from .api import api_router
 
 
 @asynccontextmanager
@@ -36,9 +36,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-app.include_router(api_router, prefix=settings.api.prefix)
-app.include_router(authorisation_router,
-                   prefix="/auth")
+# app.include_router(api_router, prefix=settings.api.prefix)
+# app.include_router(authorisation_router,
+#                    prefix="/auth")
 
 
 if __name__ == "__main__":

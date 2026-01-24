@@ -1,7 +1,8 @@
-from pydantic_settings import BaseSettings, SettingsConfigDict
-from pydantic import BaseModel, AnyUrl
-from typing import Literal
 import logging
+from typing import Literal
+
+from pydantic import BaseModel, AnyUrl
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 LOG_DEFAULT_FORMAT = (
     "[%(asctime)s.%(msecs)03d] %(module)10s:%(lineno)-3d %(levelname)-7s - %(message)s"
@@ -10,19 +11,25 @@ LOG_DEFAULT_FORMAT = (
 WORKER_LOG_DEFAULT_FORMAT = "[%(asctime)s.%(msecs)03d][%(processName)s] %(module)16s:%(lineno)-3d %(levelname)-7s - %(message)s"
 
 
-class RunConfig(BaseModel):
+class RunConfig(
+    BaseModel
+    ):
     host: str = "0.0.0.0"
     port: int = 8000
 
 
-class GunicornConfig(BaseModel):
+class GunicornConfig(
+    BaseModel
+    ):
     host: str = "0.0.0.0"
     port: int = 8000
     workers: int = 1
     timeout: int = 900
 
 
-class LoggingConfig(BaseModel):
+class LoggingConfig(
+    BaseModel
+    ):
     log_level: Literal[
         "debug",
         "info",
@@ -38,12 +45,16 @@ class LoggingConfig(BaseModel):
         return logging.getLevelNamesMapping()[self.log_level.upper()]
 
 
-class ApiPrefix(BaseModel):
+class ApiPrefix(
+    BaseModel
+    ):
     prefix: str = "/api"
 
 
-class DatabaseConfig(BaseModel):
-    url: AnyUrl
+class DatabaseConfig(
+    BaseModel
+    ):
+    url: AnyUrl = "sqlite+aiosqlite:///csm.db"
     echo: bool = False
     echo_pool: bool = False
     pool_size: int = 50
@@ -58,9 +69,13 @@ class DatabaseConfig(BaseModel):
     }
 
 
-class Settings(BaseSettings):
+class Settings(
+    BaseSettings
+    ):
     model_config = SettingsConfigDict(
         env_file=(".env.template", ".env"),
+        env_file_encoding="utf-8",
+        extra="ignore",
         case_sensitive=False,
         env_nested_delimiter="__",
         env_prefix="APP_CONFIG__",
@@ -69,10 +84,7 @@ class Settings(BaseSettings):
     gunicorn: GunicornConfig = GunicornConfig()
     logging: LoggingConfig = LoggingConfig()
     api: ApiPrefix = ApiPrefix()
-    db: DatabaseConfig | None = None
+    db: DatabaseConfig
 
-    bot_token: str = ""
-    base_site: str = ""
-    admin_id: str = ""
 
 settings = Settings()
